@@ -3,7 +3,6 @@ package com.example.demo.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -51,13 +50,13 @@ public class UserControllerLayer {
 
 
     // Method to add an item to user's shopping list
-    @GetMapping("users/{id}/shopping-list/{fooditem}")
+    @GetMapping("users/{id}/shopping-list/{foodItem}")
     public @ResponseBody Boolean addItemToUserShoppingList(@PathVariable String id, @PathVariable String foodItem){
         return userServiceLayer.addItemToUserShoppingList(id, foodItem);
     }
 
     // Method to remove an item from user's shopping list
-    @GetMapping("users/{id}/shopping-list/{fooditem}")
+    @DeleteMapping("users/{id}/shopping-list/{foodItem}")
     public @ResponseBody Boolean removeItemFromUserShoppingList(@PathVariable String id, @PathVariable String foodItem){
         return userServiceLayer.removeItemFromUserShoppingList(id, foodItem);
     }

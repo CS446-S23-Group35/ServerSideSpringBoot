@@ -5,14 +5,20 @@ import jakarta.persistence.Table;
 
 import java.util.ArrayList;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name="")
 public class User {
 
     @Id
     private String userName;
-    private ArrayList<FoodItem> inventory;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    private ArrayList<FoodItem> inventory;
+    
+    @JdbcTypeCode(SqlTypes.JSON)
     private ArrayList<FoodItem> shoppingList;
 
 
