@@ -1,24 +1,24 @@
 package com.example.demo.user;
-import jakarta.persistence.Entity;
+/*import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;*/
 
 import java.util.ArrayList;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-@Entity
-@Table(name="")
+
+//@Table(name="")
 public class User {
 
-    @Id
+  //  @Id
     private String userName;
 
-    @JdbcTypeCode(SqlTypes.JSON)
+   // @JdbcTypeCode(SqlTypes.JSON)
     private ArrayList<FoodItem> inventory;
     
-    @JdbcTypeCode(SqlTypes.JSON)
+  //  @JdbcTypeCode(SqlTypes.JSON)
     private ArrayList<FoodItem> shoppingList;
 
 

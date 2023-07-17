@@ -17,7 +17,7 @@ public class UserControllerLayer {
     public @ResponseBody User getUser(@PathVariable String id){
         return userServiceLayer.getUser(id);
     }
-
+/*
     // Return the Inventory data for the user with the associated username
     @GetMapping("users/{id}/inventory")
     public @ResponseBody List<FoodItem> getUsersInventory(@PathVariable String id){
@@ -75,5 +75,5 @@ public class UserControllerLayer {
     public @ResponseBody User getSampleUsers(){
         return new User("sampleName");
     }
-
+*/
 }
