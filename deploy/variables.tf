@@ -43,3 +43,22 @@ variable "db_password" {
   description = "Password for the user database"
   sensitive   = true
 }
+
+# ECS Variables
+
+variable "application_name" {
+  type        = string
+  description = "Name of the application"
+  default     = "application"
+}
+
+variable "application_port" {
+  type        = number
+  description = "Port to run the application on"
+  default     = 8080
+}
+
+variable "application_image" {
+  type        = string
+  description = "Docker image to run"
+}

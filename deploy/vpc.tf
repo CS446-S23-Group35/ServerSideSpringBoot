@@ -61,8 +61,42 @@ resource "aws_route_table" "public_rt" {
 }
 
 resource "aws_route_table_association" "public_subnet_asso" {
- subnet_id      = aws_subnet.public_sub[1].id
- route_table_id = aws_route_table.public_rt.id
+  count = length(var.aws_availability_zones)
+  subnet_id      = aws_subnet.public_sub[count.index].id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_eip" "gw" {
+  count      = length(var.aws_availability_zones)
+  vpc        = true
+  depends_on = [aws_internet_gateway.gw]
+}
+
+resource "aws_nat_gateway" "gw" {
+  count         = length(var.aws_availability_zones)
+  subnet_id     = aws_subnet.public_sub[count.index].id
+  allocation_id = aws_eip.gw[count.index].id
+}
+
+resource "aws_route_table" "private_rt" {
+  count = length(var.aws_availability_zones)
+  vpc_id = aws_vpc.backend_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    # nat_gateway_id = aws_nat_gateway.gw[count.index].id
+    gateway_id = aws_internet_gateway.gw.id
+  }
+
+  tags = {
+    Name = "Private Route Table"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = length(var.aws_availability_zones)
+  subnet_id      = element(aws_subnet.private_sub.*.id, count.index)
+  route_table_id = element(aws_route_table.private_rt.*.id, count.index)
 }
 
 ###################
@@ -122,6 +156,15 @@ resource "aws_security_group" "load_balancer" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+   protocol         = "tcp"
+   from_port        = 443
+   to_port          = 443
+   cidr_blocks      = ["0.0.0.0/0"]
+   ipv6_cidr_blocks = ["::/0"]
+  }
+ 
+
   egress {
     from_port = 0
     to_port   = 0
@@ -136,9 +179,26 @@ resource "aws_security_group" "application_sb" {
 
   ingress {
     protocol    = "tcp"
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = var.application_port
+    to_port     = var.application_port
     cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {
@@ -146,18 +206,5 @@ resource "aws_security_group" "application_sb" {
     to_port   = 0
     protocol  = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-#############
-# RDS Group #
-#############
-
-resource "aws_db_subnet_group" "user_db" {
-  name       = "user-db-subnet-group"
-  subnet_ids = [aws_subnet.private_sub[1].id, aws_subnet.private_sub[2].id]
-
-  tags = {
-    Name = "DB subnet group"
   }
 }
