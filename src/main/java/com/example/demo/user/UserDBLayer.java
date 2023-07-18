@@ -1,35 +1,48 @@
 package com.example.demo.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 @Repository
 public class UserDBLayer {
 
-    public User getUser(String userName){
-        return new User(userName +"_dataAccessLayerUser");
+    @Autowired
+    UserRepository repository;
+
+    public User getUser(String id) {
+        return repository.findById(id).orElse(null);
     }
 
-    public List<FoodItem> getUsersInventory(String id) {
-        return new ArrayList<FoodItem>();
+    public HashMap<Long, FoodItem> getUsersInventory(String id) {
+        User user = getUser(id);
+        if (getUser(id) == null) return null;
+        return user.getInventory();
     }
 
     public FoodItem getFoodItemForUser(String id, String foodItem) {
         return new FoodItem();
     }
 
-    public Boolean addItemToUserInventory(String id, String foodItem) {
+    public Boolean addItemToUserInventory(String id, FoodItem foodItem) {
+        User user = getUser(id);
+        if (getUser(id) == null) return false;
+        user.getInventory().put(foodItem.getId(), foodItem);
+        repository.save(user);
         return true;
     }
 
-    public Boolean deleteItemFromUserInventory(String id, String foodItem) {
+    public Boolean deleteItemFromUserInventory(String id, Long foodItemId) {
+        User user = getUser(id);
+        if (getUser(id) == null) return false;
+        user.getInventory().remove(foodItemId);
+        repository.save(user);
         return true;
-
     }
 
-    public List<FoodItem> getUserShoppingList(String id) {
+    public ArrayList<FoodItem> getUserShoppingList(String id) {
         return new ArrayList<FoodItem>();
     }
 
