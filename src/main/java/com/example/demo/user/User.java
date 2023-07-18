@@ -53,5 +53,4 @@ public class User {
         this.inventory = inventory;
         this.shopping_list = shoppingList;
     }
-
 }
