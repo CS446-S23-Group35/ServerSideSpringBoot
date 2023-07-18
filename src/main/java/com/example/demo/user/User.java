@@ -5,7 +5,10 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> bc12cca (Implemented some API methods for inventory/users tables)
 import java.util.HashMap;
 
 @Entity
@@ -19,7 +22,11 @@ public class User {
     private HashMap<Long, FoodItem> inventory = new HashMap<Long, FoodItem>();
 
     @JdbcTypeCode(SqlTypes.JSON)
+<<<<<<< HEAD
     private ArrayList<FoodItem> shopping_list = new ArrayList<FoodItem>();
+=======
+    private HashMap<Long, FoodItem> shoppingList = new HashMap<Long, FoodItem>();
+>>>>>>> bc12cca (Implemented some API methods for inventory/users tables)
 
 
     public String getId() {
