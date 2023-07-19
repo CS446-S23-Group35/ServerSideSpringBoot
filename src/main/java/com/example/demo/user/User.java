@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Entity
@@ -18,7 +19,7 @@ public class User {
     private HashMap<Long, FoodItem> inventory = new HashMap<Long, FoodItem>();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    private HashMap<Long, FoodItem> shoppingList = new HashMap<Long, FoodItem>();
+    private ArrayList<FoodItem> shoppingList = new ArrayList<FoodItem>();
 
 
     public String getId() {
@@ -37,19 +38,17 @@ public class User {
         this.inventory = inventory;
     }
 
-    public HashMap<Long, FoodItem> getShoppingList() { return shoppingList; }
+    public ArrayList<FoodItem> getShoppingList() { return shoppingList; }
 
-    public void setShoppingList(HashMap<Long, FoodItem> shoppingList) { this.shoppingList = shoppingList; }
+    public void setShoppingList(ArrayList<FoodItem> shoppingList) { this.shoppingList = shoppingList; }
 
     public User() { }
 
     public User(String userName) {
         this.id = userName;
-        this.inventory = new HashMap<Long, FoodItem>();
-        this.shoppingList = new HashMap<Long, FoodItem>();
     }
 
-    public User(String userName, HashMap<Long, FoodItem> inventory, HashMap<Long, FoodItem> shoppingList) {
+    public User(String userName, HashMap<Long, FoodItem> inventory, ArrayList<FoodItem> shoppingList) {
         this.id = userName;
         this.inventory = inventory;
         this.shoppingList = shoppingList;
