@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "application" {
       application_name = var.application_name
       container_image = var.application_image
       container_port = var.application_port
-      db_url = aws_db_instance.user_db.address
+      db_url = format("jdbc:postgresql://%s/postgres", aws_db_instance.user_db.address)
       db_username = aws_db_instance.user_db.username
       db_password = aws_db_instance.user_db.password
     }
