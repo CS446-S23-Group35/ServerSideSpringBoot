@@ -19,7 +19,7 @@ public class User {
     private HashMap<Long, FoodItem> inventory = new HashMap<Long, FoodItem>();
 
     @JdbcTypeCode(SqlTypes.JSON)
-    private ArrayList<FoodItem> shoppingList = new ArrayList<FoodItem>();
+    private ArrayList<FoodItem> shopping_list = new ArrayList<FoodItem>();
 
 
     public String getId() {
@@ -38,9 +38,9 @@ public class User {
         this.inventory = inventory;
     }
 
-    public ArrayList<FoodItem> getShoppingList() { return shoppingList; }
+    public ArrayList<FoodItem> getShoppingList() { return shopping_list; }
 
-    public void setShoppingList(ArrayList<FoodItem> shoppingList) { this.shoppingList = shoppingList; }
+    public void setShoppingList(ArrayList<FoodItem> shoppingList) { this.shopping_list = shoppingList; }
 
     public User() { }
 
@@ -51,7 +51,7 @@ public class User {
     public User(String userName, HashMap<Long, FoodItem> inventory, ArrayList<FoodItem> shoppingList) {
         this.id = userName;
         this.inventory = inventory;
-        this.shoppingList = shoppingList;
+        this.shopping_list = shoppingList;
     }
 
 }
