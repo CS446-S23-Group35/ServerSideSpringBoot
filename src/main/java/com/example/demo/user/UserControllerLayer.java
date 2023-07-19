@@ -19,6 +19,9 @@ public class UserControllerLayer {
         return userServiceLayer.getUser(id);
     }
 
+    @GetMapping("/heartbeat")
+    public @ResponseBody Boolean heartbeat() { return true; }
+
     // Return the Inventory data for the user with the associated username
     @GetMapping("users/{id}/inventory")
     public @ResponseBody HashMap<Long, FoodItem> getUsersInventory(@PathVariable String id) {
