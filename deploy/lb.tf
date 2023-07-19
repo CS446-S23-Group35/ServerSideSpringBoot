@@ -22,7 +22,7 @@ resource "aws_alb_target_group" "main" {
    protocol            = "HTTP"
    matcher             = "200"
    timeout             = "3"
-   path                = "/health"
+   path                = "/heartbeat"
    unhealthy_threshold = "2"
   }
 }
