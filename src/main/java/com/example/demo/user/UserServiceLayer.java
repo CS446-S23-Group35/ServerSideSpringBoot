@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Service
 public class UserServiceLayer {
@@ -17,8 +21,19 @@ public class UserServiceLayer {
     @Autowired
     InventoryDBLayer inventoryDBLayer;
 
+    @Autowired
+    UserErrorLogger userErrorLogger;
+
     public User getUser(String userName) {
-        return userDBLayer.getUser(userName);
+        User curUser = userDBLayer.getUser(userName);
+
+        for(FoodItem foodItem : curUser.getShoppingList()){
+            if(!foodItem.validateFoodItem()){
+                userErrorLogger.addUserOfInterest(curUser.getId());
+            }
+        }
+
+        return curUser;
     }
 
     public HashMap<Long, FoodItem> getUsersInventory(String id) {
