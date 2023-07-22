@@ -23,7 +23,7 @@ public class UserDBLayer {
     }
 
     public FoodItem getFoodItemForUser(String id, String foodItem) {
-        return new FoodItem();
+        return new InventoryFoodItem();
     }
 
     public Boolean addItemToUserInventory(String id, FoodItem foodItem) {
