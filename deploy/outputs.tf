@@ -15,3 +15,8 @@ output "rds_username" {
   value       = aws_db_instance.user_db.username
   sensitive   = true
 }
+
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID"
+  value       = aws_cognito_user_pool.pool.id
+}

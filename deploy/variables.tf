@@ -62,3 +62,9 @@ variable "application_image" {
   type        = string
   description = "Docker image to run"
 }
+
+variable "alb_tls_cert_arn" {
+  type        = string
+  description = "ARN of the TLS certificate to use for the ALB"
+  sensitive = true
+}
