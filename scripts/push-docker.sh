@@ -1,0 +1,1 @@
+docker push 068734148537.dkr.ecr.us-east-2.amazonaws.com/wastenot-springboot:$1
