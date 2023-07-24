@@ -3,7 +3,6 @@ package com.example.demo.recipe;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -15,7 +14,6 @@ import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.Script;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.FieldValueFactorScoreFunction;
 import org.opensearch.client.opensearch._types.query_dsl.FunctionBoostMode;
@@ -25,14 +23,9 @@ import org.opensearch.client.opensearch._types.query_dsl.FunctionScoreQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MultiMatchQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
-import org.opensearch.client.opensearch._types.query_dsl.ScoreFunctionBase;
-import org.opensearch.client.opensearch._types.query_dsl.ScriptScoreFunction;
-import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.opensearch.client.util.ObjectBuilder;
 
 public class OpenSearchImpl implements Searcher{
     private OpenSearchClient client;
@@ -79,24 +72,13 @@ public class OpenSearchImpl implements Searcher{
 
     @Override
     public List<Recipe> SearchByName(String name, Filters filters) {
-        List<Query> mustNotQueries = new ArrayList<>();
-        for (String ingredient : filters.excludedIngredients) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-            .field("ingredients.name")
-            .query(FieldValue.of(ingredient))
-            .build();
-
-            mustNotQueries.add(matchQuery._toQuery());
-        }
-
         MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
         .query(name)
         .fields("title^8", "description^4", "tags", "ingredients.name")
         .fuzziness("AUTO")
         .build();
 
-        BoolQuery boolQuery = new BoolQuery.Builder()
-        .mustNot(mustNotQueries)
+        BoolQuery boolQuery = createRestrictionFilter(filters)
         .should(multiMatchQuery._toQuery())
         .build();
 
@@ -130,52 +112,18 @@ public class OpenSearchImpl implements Searcher{
 
     @Override
     public List<Recipe> SearchByInventory(Filters filters) {
-        List<Query> mustNotQueries = new ArrayList<>();
-        for (String ingredient : filters.excludedIngredients) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-            .field("ingredients.name")
-            .query(FieldValue.of(ingredient))
-            .build();
+        BoolQuery boolQuery = createRestrictionFilter(filters).build();
 
-            mustNotQueries.add(matchQuery._toQuery());
-        }
-        BoolQuery boolQuery = new BoolQuery.Builder().mustNot(mustNotQueries).build();
-
-        FieldValueFactorScoreFunction scoreFunc = new FieldValueFactorScoreFunction.Builder()
-        .missing(1.0)
-        .factor(1.0)
-        .field("rating")
-        .build();
+        double baseWeight = 2.0;
+        double expiringWeight = 1.0 + baseWeight * filters.inventoryIngredients.size();
 
         List<FunctionScore> functions = new ArrayList<>();
         for (String ingredient : filters.inventoryIngredients) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-            .field("ingredients.name")
-            .query(FieldValue.of(ingredient))
-            .build();
-
-            functions.add(
-                new FunctionScore.Builder()
-                .filter(matchQuery._toQuery())
-                .weight(2.0)
-                .fieldValueFactor(scoreFunc)
-                .build()
-            );
+            functions.add(createConstantIngredientScore(ingredient, baseWeight));
         }
 
         for (String ingredient : filters.expiringIngedients) {
-            MatchQuery matchQuery = new MatchQuery.Builder()
-            .field("ingredients.name")
-            .query(FieldValue.of(ingredient))
-            .build();
-
-            functions.add(
-                new FunctionScore.Builder()
-                .filter(matchQuery._toQuery())
-                .weight(1.0 + 2.0 * filters.inventoryIngredients.size())
-                .fieldValueFactor(scoreFunc)
-                .build()
-            );
+            functions.add(createConstantIngredientScore(ingredient, expiringWeight));   
         }
 
         FunctionScoreQuery fsq =  new FunctionScoreQuery.Builder()
@@ -199,5 +147,55 @@ public class OpenSearchImpl implements Searcher{
             System.out.println("Error: " + e.getCause());
         }
         return recipes;
+    }
+
+    // createRestrictionFilter makes a BoolQuery builder and adds to it must_not queries for all excluded ingredients
+    // and must queries for dietary restrictions.
+    private BoolQuery.Builder createRestrictionFilter(Filters filters) {
+        List<Query> mustNotQueries = new ArrayList<>();
+        for (String ingredient : filters.excludedIngredients) {
+            MatchQuery matchQuery = new MatchQuery.Builder()
+            .field("ingredients.name")
+            .query(FieldValue.of(ingredient))
+            .build();
+
+            mustNotQueries.add(matchQuery._toQuery());
+        }
+
+        List<Query> mustQueries = new ArrayList<>();
+        for (DietaryRestrictions r : filters.dietaryRestrictions) {
+            //{"match": {"metadata.dietary_restrictions.name": true}}
+
+            MatchQuery matchQuery = new MatchQuery.Builder()
+            .field("metadata.dietary_restrictions." + r.getBooleanName())
+            .query(FieldValue.of(true))
+            .build();
+
+            mustQueries.add(matchQuery._toQuery());
+        }
+
+        return new BoolQuery.Builder().mustNot(mustNotQueries).must(mustQueries);
+    }
+
+    // A constant score function does not exist in this SDK for some reason ¯\_(ツ)_/¯ 
+    private static FieldValueFactorScoreFunction constantScoreFunction = new FieldValueFactorScoreFunction.Builder()
+        .missing(1.0)
+        .factor(1.0)
+        .field("field")
+        .build();
+
+    // createConstantIngredientScore creates a function score query that boosts recipes with the given ingredient
+    // by the given weight.
+    private FunctionScore createConstantIngredientScore(String ingredient, double weight) {
+        MatchQuery matchQuery = new MatchQuery.Builder()
+            .field("ingredients.name")
+            .query(FieldValue.of(ingredient))
+            .build();
+
+            return new FunctionScore.Builder()
+            .filter(matchQuery._toQuery())
+            .weight(weight)
+            .fieldValueFactor(constantScoreFunction)
+            .build();
     }
 }

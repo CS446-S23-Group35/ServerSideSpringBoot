@@ -28,11 +28,21 @@ public class Recipe {
         public String source_url;
         public DietartyMetadata dietary;
     }
-
     public static class DietartyMetadata {
         public boolean is_vegetarian;
         public boolean is_vegan;
         public boolean is_gluten_free;
+        public boolean is_dairy_free;
+        public boolean is_nut_free;
+        public boolean is_shellfish_free;
+        public boolean is_egg_free;
+        public boolean is_soy_free;
+        public boolean is_fish_free;
+        public boolean is_pork_free;
+        public boolean is_red_meat_free;
+        public boolean is_alcohol_free;
+        public boolean is_kosher;
+        public boolean is_halal;
     }
 
     public static class ServingRange {
