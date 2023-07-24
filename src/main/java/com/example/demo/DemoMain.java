@@ -19,15 +19,19 @@ public class DemoMain {
 	}
 
 	// public static void main(String[] args) {
+	// 	Searcher.Filters filters =  Searcher.Filters.empty()
+	// 	.withExcludedIngredients(
+	// 		Arrays.asList("flour", "farro")
+	// 	).withInventoryIngredients(
+	// 		Arrays.asList("paprika", "vanilla extract", "coffee")
+	// 	).withExpiringIngredients(
+	// 		Arrays.asList("pork")
+	// 	);//.withDietaryRestrictions(
+	// 	// 	Arrays.asList(Searcher.DietaryRestrictions.VEGAN)
+	// 	// );
+
 	// 	Searcher searcher = new OpenSearchImpl("localhost");
-	// 	List<Recipe> recipes = searcher.SearchByInventory(
-	// 		Searcher.Filters.empty().withExcludedIngredients(
-	// 			Arrays.asList("flour", "farro")
-	// 		).withInventoryIngredients(
-	// 			Arrays.asList("paprika", "vanilla extract", "coffee")
-	// 		).withExpiringIngredients(
-	// 			Arrays.asList("pork")
-	// 		));
+	// 	List<Recipe> recipes = searcher.SearchByInventory(filters);
 	// 	System.out.println("Found " + recipes.size() + " recipes");
 	// 	for(Recipe recipe : recipes){ 
 	// 		System.out.println(recipe.name);
