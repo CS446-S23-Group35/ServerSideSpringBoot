@@ -1,5 +1,6 @@
 package com.example.demo.recipe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.qos.logback.core.filter.Filter;
@@ -29,7 +30,12 @@ public interface Searcher {
         }
 
         public static Filters empty() {
-            return new Filters(null, null, null, null);
+            return new Filters(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>()
+            );
         }
 
         public Filters withExcludedIngredients(List<String> excludedIngredients) {
@@ -50,20 +56,29 @@ public interface Searcher {
     }
 
     public enum DietaryRestrictions {
-        VEGAN,
-        VEGETARIAN,
-        GLUTEN_FREE,
-        DAIRY_FREE,
-        NUT_FREE,
-        SHELLFISH_FREE,
-        EGG_FREE,
-        SOY_FREE,
-        FISH_FREE,
-        PORK_FREE,
-        RED_MEAT_FREE,
-        ALCOHOL_FREE,
-        KOSHER,
-        HALAL
+        VEGAN("is_vegan"),
+        VEGETARIAN("is_vegetarian"),
+        GLUTEN_FREE("is_gluten_free"),
+        DAIRY_FREE("is_dairy_free"),
+        NUT_FREE("is_nut_free"),
+        SHELLFISH_FREE("is_shellfish_free"),
+        EGG_FREE("is_egg_free"),
+        SOY_FREE("is_soy_free"),
+        FISH_FREE("is_fish_free"),
+        PORK_FREE("is_pork_free"),
+        RED_MEAT_FREE("is_red_meat_free"),
+        ALCOHOL_FREE("is_alcohol_free"),
+        KOSHER("is_kosher"),
+        HALAL("is_halal");
+
+        private String booleanName;
+        private DietaryRestrictions(String booleanName) {
+            this.booleanName = booleanName;
+        }
+
+        public String getBooleanName() {
+            return this.booleanName;
+        }
     }
 
     public List<Recipe> SearchByName(String name, Filters filters);
