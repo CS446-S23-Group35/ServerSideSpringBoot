@@ -3,6 +3,7 @@ package com.example.demo.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,60 +15,60 @@ public class UserControllerLayer {
 
     // Return the User data for the user with the associated username as per the incoming request
     // User data includes username plus their entire inventory list
-    @GetMapping("users/{id}")
-    public @ResponseBody User getUser(@PathVariable String id) {
-        return userServiceLayer.getUser(id);
+    @GetMapping("users")
+    public @ResponseBody User getUser(Principal principal) {
+        return userServiceLayer.getUser(principal.getName());
     }
 
     @GetMapping("/heartbeat")
     public @ResponseBody Boolean heartbeat() { return true; }
 
     // Return the Inventory data for the user with the associated username
-    @GetMapping("users/{id}/inventory")
-    public @ResponseBody HashMap<Long, FoodItem> getUsersInventory(@PathVariable String id) {
-        return userServiceLayer.getUsersInventory(id);
+    @GetMapping("users/inventory")
+    public @ResponseBody HashMap<Long, FoodItem> getUsersInventory(Principal principal) {
+        return userServiceLayer.getUsersInventory(principal.getName());
     }
 
     // Return the food item data for the user with the associated username and associated food item name
-    @GetMapping("users/{id}/inventory/{foodItem}")
-    public @ResponseBody FoodItem getFoodItemForUser(@PathVariable String id, @PathVariable String foodItem) {
-        return userServiceLayer.getFoodItemForUser(id, foodItem);
+    @GetMapping("users/inventory/{foodItem}")
+    public @ResponseBody FoodItem getFoodItemForUser(Principal principal, @PathVariable String foodItem) {
+        return userServiceLayer.getFoodItemForUser(principal.getName(), foodItem);
     }
 
     // Method to add an item to a user's inventory
-    @PostMapping("users/{id}/inventory")
-    public @ResponseBody Boolean addItemToUserInventory(@PathVariable String id, @RequestBody FoodItem foodItem) {
-        return userServiceLayer.addItemToUserInventory(id, foodItem);
+    @PostMapping("users/inventory")
+    public @ResponseBody Boolean addItemToUserInventory(Principal principal, @RequestBody FoodItem foodItem) {
+        return userServiceLayer.addItemToUserInventory(principal.getName(), foodItem);
     }
 
     // Method to remove an item from a User's inventory
-    @DeleteMapping("users/{id}/inventory/{foodItemId}")
-    public @ResponseBody Boolean deleteItemFromUserInventory(@PathVariable String id, @PathVariable Long foodItemId) {
-        return userServiceLayer.deleteItemFromUserInventory(id, foodItemId);
+    @DeleteMapping("users/inventory/{foodItemId}")
+    public @ResponseBody Boolean deleteItemFromUserInventory(Principal principal, @PathVariable Long foodItemId) {
+        return userServiceLayer.deleteItemFromUserInventory(principal.getName(), foodItemId);
     }
 
     // Return the Shopping list data for the user with the associated username
-    @GetMapping("users/{id}/shopping-list")
-    public @ResponseBody List<FoodItem> getUserShoppingList(@PathVariable String id) {
-        return userServiceLayer.getUserShoppingList(id);
+    @GetMapping("users/shopping-list")
+    public @ResponseBody List<FoodItem> getUserShoppingList(Principal principal) {
+        return userServiceLayer.getUserShoppingList(principal.getName());
     }
 
     // Method to add an item to user's shopping list
-    @GetMapping("users/{id}/shopping-list/{foodItem}")
-    public @ResponseBody Boolean addItemToUserShoppingList(@PathVariable String id, @PathVariable String foodItem) {
-        return userServiceLayer.addItemToUserShoppingList(id, foodItem);
+    @GetMapping("users/shopping-list/{foodItem}")
+    public @ResponseBody Boolean addItemToUserShoppingList(Principal principal, @PathVariable String foodItem) {
+        return userServiceLayer.addItemToUserShoppingList(principal.getName(), foodItem);
     }
 
     // Method to remove an item from user's shopping list
-    @DeleteMapping("users/{id}/shopping-list/{foodItem}")
-    public @ResponseBody Boolean removeItemFromUserShoppingList(@PathVariable String id, @PathVariable String foodItem) {
-        return userServiceLayer.removeItemFromUserShoppingList(id, foodItem);
+    @DeleteMapping("users/shopping-list/{foodItem}")
+    public @ResponseBody Boolean removeItemFromUserShoppingList(Principal principal, @PathVariable String foodItem) {
+        return userServiceLayer.removeItemFromUserShoppingList(principal.getName(), foodItem);
     }
 
     // Method to clear shopping list
-    @DeleteMapping("users/{id}/shopping-list")
-    public @ResponseBody Boolean deleteUserShoppingList(@PathVariable String id) {
-        return userServiceLayer.deleteUserShoppingList(id);
+    @DeleteMapping("users/shopping-list")
+    public @ResponseBody Boolean deleteUserShoppingList(Principal principal) {
+        return userServiceLayer.deleteUserShoppingList(principal.getName());
     }
 
     // method for testing endpoint access from a client
