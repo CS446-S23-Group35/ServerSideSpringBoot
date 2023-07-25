@@ -40,3 +40,35 @@ resource "aws_alb_listener" "https" {
     type             = "forward"
   }
 }
+
+# resource "aws_alb_target_group" "search" {
+#   name        = "${var.application_name}-search-tg"
+#   port        = 9200
+#   protocol    = "HTTP"
+#   vpc_id      = aws_vpc.backend_vpc.id
+#   target_type = "ip"
+ 
+#   health_check {
+#    healthy_threshold   = "3"
+#    interval            = "30"
+#    protocol            = "HTTPS"
+#    matcher             = "200"
+#    timeout             = "3"
+#    path                = "/"
+#    unhealthy_threshold = "2"
+#   }
+# }
+
+# resource "aws_alb_listener" "search_http" {
+#   load_balancer_arn = aws_lb.main.id
+#   port              = 9200
+#   protocol          = "HTTP"
+ 
+#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+#   certificate_arn   = var.alb_search_cert_arn
+ 
+#   default_action {
+#     target_group_arn = aws_alb_target_group.search.id
+#     type             = "forward"
+#   }
+# }
