@@ -16,6 +16,10 @@ public class UserDBLayer {
         return repository.findById(id).orElse(null);
     }
 
+    public User createUser(String id) {
+        return repository.save(new User(id));
+    }
+
     public HashMap<Long, FoodItem> getUsersInventory(String id) {
         User user = getUser(id);
         if (getUser(id) == null) return null;
