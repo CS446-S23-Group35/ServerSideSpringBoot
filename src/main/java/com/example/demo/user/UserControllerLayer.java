@@ -1,9 +1,13 @@
 package com.example.demo.user;
 
+import com.example.demo.recipe.OpenSearchImpl;
+import com.example.demo.recipe.Recipe;
+import com.example.demo.recipe.Searcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,6 +22,21 @@ public class UserControllerLayer {
     @GetMapping("users")
     public @ResponseBody User getUser(Principal principal) {
         return userServiceLayer.getUser(principal.getName());
+    }
+
+    @GetMapping("/recipes")
+    public @ResponseBody List<Recipe> getRecipes(Principal principal) {
+        Searcher searcher = new OpenSearchImpl("localhost");
+        List<Recipe> recipes = searcher.SearchByInventory(
+             Searcher.Filters.empty().withExcludedIngredients(Arrays.asList("flour", "farro"))
+             .withInventoryIngredients(Arrays.asList("paprika", "vanilla extract", "coffee"))
+             .withExpiringIngredients(Arrays.asList("pork"))
+        );
+        System.out.println("Found " + recipes.size() + " recipes");
+        for(Recipe recipe : recipes){
+             System.out.println(recipe.name);
+        }
+        return recipes;
     }
 
     @GetMapping("/heartbeat")
