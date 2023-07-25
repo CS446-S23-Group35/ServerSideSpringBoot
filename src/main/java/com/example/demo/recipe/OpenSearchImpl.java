@@ -74,7 +74,7 @@ public class OpenSearchImpl implements Searcher{
     public List<Recipe> SearchByName(String name, Filters filters) {
         MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
         .query(name)
-        .fields("title^8", "description^4", "tags", "ingredients.name")
+        .fields("name^8", "description^4", "tags", "ingredients.name")
         .fuzziness("AUTO")
         .build();
 
@@ -113,6 +113,35 @@ public class OpenSearchImpl implements Searcher{
     @Override
     public List<Recipe> SearchByInventory(Filters filters) {
         BoolQuery boolQuery = createRestrictionFilter(filters).build();
+
+        double baseWeight = 2.0;
+        double expiringWeight = 1.0 + baseWeight * filters.inventoryIngredients.size();
+
+        List<FunctionScore> functions = new ArrayList<>();
+        for (String ingredient : filters.inventoryIngredients) {
+            functions.add(createConstantIngredientScore(ingredient, baseWeight));
+        }
+
+        for (String ingredient : filters.expiringIngedients) {
+            functions.add(createConstantIngredientScore(ingredient, expiringWeight));   
+        }
+
+        FunctionScoreQuery fsq =  new FunctionScoreQuery.Builder()
+        .functions(functions)
+        .query(boolQuery._toQuery())
+        .scoreMode(FunctionScoreMode.Sum).boostMode(FunctionBoostMode.Replace).build();
+
+        return doSearch(fsq._toQuery());
+    }
+
+    public List<Recipe> SearchByNameWithInventory(String name, Filters filters) {
+        MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
+        .query(name)
+        .fields("name^40", "description^20", "tags^5", "ingredients.name^5")
+        .fuzziness("AUTO")
+        .build();
+
+        BoolQuery boolQuery = createRestrictionFilter(filters).should(multiMatchQuery._toQuery()).build();
 
         double baseWeight = 2.0;
         double expiringWeight = 1.0 + baseWeight * filters.inventoryIngredients.size();
