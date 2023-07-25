@@ -68,3 +68,9 @@ variable "alb_tls_cert_arn" {
   description = "ARN of the TLS certificate to use for the ALB"
   sensitive = true
 }
+
+variable "alb_search_cert_arn" {
+  type        = string
+  description = "ARN of the TLS certificate to use for the ALB for searching"
+  sensitive = true
+}

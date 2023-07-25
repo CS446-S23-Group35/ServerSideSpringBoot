@@ -12,6 +12,10 @@ resource "aws_instance" "bastion" {
   tags = {
     Name = "bastion"
   }
+  
+  lifecycle {
+    ignore_changes = [iam_instance_profile, ami]
+  }
 }
 
 data "aws_ami" "amazon_linux" {

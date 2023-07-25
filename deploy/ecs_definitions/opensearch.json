@@ -1,0 +1,39 @@
+[
+  {
+    "name": "${application_name}-search",
+    "image": "opensearchproject/opensearch",
+    "essential": true,
+    "environment": [
+      {
+        "name": "DISABLE_SECURITY_PLUGIN",
+        "value": "true"
+      },
+      {
+        "name": "discovery.type",
+        "value": "single-node"
+      }
+    ],
+    "portMappings": [
+      {
+        "protocol": "tcp",
+        "containerPort": 9200,
+        "hostPort": 9200
+      },
+      {
+        "protocol": "tcp",
+        "containerPort": 9600,
+        "hostPort": 9600
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/${application_name}-search",
+        "awslogs-region": "us-east-2",
+        "awslogs-stream-prefix": "streaming"
+      }
+    },
+    "platform": "linux/arm64"
+  }
+]
+  
