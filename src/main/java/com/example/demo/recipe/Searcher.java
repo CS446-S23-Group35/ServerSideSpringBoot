@@ -83,4 +83,5 @@ public interface Searcher {
 
     public List<Recipe> SearchByName(String name, Filters filters);
     public List<Recipe> SearchByInventory(Filters filters);
+    public List<Recipe> SearchByNameWithInventory(String name, Filters filters);
 }
