@@ -3,16 +3,28 @@ package com.example.demo.user;
 import com.example.demo.recipe.OpenSearchImpl;
 import com.example.demo.recipe.Recipe;
 import com.example.demo.recipe.Searcher;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+class RecipeQuery {
+    @JsonProperty("name")
+    String name;
+
+    @JsonProperty("includedIngredients")
+    List<String> includedIngredients;
+
+    @JsonProperty("excludedIngredients")
+    List<String> excludedIngredients;
+}
 
 @RestController
 public class UserControllerLayer {
+    Searcher searcher = new OpenSearchImpl(System.getenv("OPENSEARCH_ADDRESS"));
 
     @Autowired
     UserServiceLayer userServiceLayer;
@@ -24,19 +36,35 @@ public class UserControllerLayer {
         return userServiceLayer.getUser(principal.getName());
     }
 
-    @GetMapping("/recipes")
-    public @ResponseBody List<Recipe> getRecipes(Principal principal) {
-        Searcher searcher = new OpenSearchImpl("localhost");
-        List<Recipe> recipes = searcher.SearchByInventory(
-             Searcher.Filters.empty().withExcludedIngredients(Arrays.asList("flour", "farro"))
-             .withInventoryIngredients(Arrays.asList("paprika", "vanilla extract", "coffee"))
-             .withExpiringIngredients(Arrays.asList("pork"))
+    @GetMapping("register")
+    public @ResponseBody User register(Principal principal) {
+        return userServiceLayer.register(principal.getName());
+    }
+
+    @PostMapping(value = "/recipes", consumes = {"application/json"})
+    public @ResponseBody List<Recipe> getRecipes(Principal principal, @RequestBody RecipeQuery body) {
+        HashMap<Long, FoodItem> inventory = getUser(principal).getInventory();
+        List<FoodItem> inventory_list = new ArrayList<>(inventory.values());
+        List<FoodItem> expiring_inventory_list = new ArrayList<>(inventory_list);
+
+        expiring_inventory_list = expiring_inventory_list.stream()
+            .filter(item -> TimeUnit.DAYS.convert(Math.abs(item.getExpiryDate().getTime() - new Date().getTime()), TimeUnit.MILLISECONDS) < 7)
+            .toList();
+
+        List<String> inventory_ingredients = new ArrayList<>(inventory_list.stream()
+            .map(FoodItem::getName)
+            .toList());
+        inventory_ingredients.addAll(body.includedIngredients);
+
+        List<String> expiring_ingredients = new ArrayList<>(expiring_inventory_list.stream()
+            .map(FoodItem::getName)
+            .toList());
+
+        return searcher.SearchByInventory(
+            Searcher.Filters.empty().withExcludedIngredients(body.excludedIngredients)
+            .withInventoryIngredients(inventory_ingredients)
+            .withExpiringIngredients(expiring_ingredients)
         );
-        System.out.println("Found " + recipes.size() + " recipes");
-        for(Recipe recipe : recipes){
-             System.out.println(recipe.name);
-        }
-        return recipes;
     }
 
     @GetMapping("/heartbeat")

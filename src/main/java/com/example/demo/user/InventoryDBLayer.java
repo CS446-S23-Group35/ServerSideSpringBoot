@@ -3,8 +3,7 @@ package com.example.demo.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 
 @Repository
 public class InventoryDBLayer {
@@ -18,7 +17,7 @@ public class InventoryDBLayer {
 
     public Boolean addItemForUser(String id, FoodItem foodItem) {
         FoodItem item = repository.findById(foodItem.getId()).orElse(null);
-        HashSet<String> newOwners;
+        List<String> newOwners;
 
         if (item == null) {
             item = foodItem;

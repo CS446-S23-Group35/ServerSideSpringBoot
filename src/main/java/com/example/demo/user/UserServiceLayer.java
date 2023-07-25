@@ -60,4 +60,7 @@ public class UserServiceLayer {
         return userDBLayer.deleteUserShoppingList(id);
     }
 
+    public User register(String id) {
+        return userDBLayer.createUser(id);
+    }
 }

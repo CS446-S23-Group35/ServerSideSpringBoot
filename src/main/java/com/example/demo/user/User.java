@@ -51,8 +51,8 @@ public class User {
 
     public User() { }
 
-    public User(String userName) {
-        this.id = userName;
+    public User(String id) {
+        this.id = id;
     }
 
     public User(String userName, HashMap<Long, FoodItem> inventory, ArrayList<FoodItem> shoppingList) {
