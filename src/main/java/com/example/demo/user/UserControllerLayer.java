@@ -64,7 +64,7 @@ public class UserControllerLayer {
             .map(FoodItem::getName)
             .toList());
 
-        return searcher.SearchByInventory(
+        return searcher.SearchByNameWithInventory( body.name,
             Searcher.Filters.empty().withExcludedIngredients(body.excludedIngredients)
             .withInventoryIngredients(inventory_ingredients)
             .withExpiringIngredients(expiring_ingredients)
@@ -123,7 +123,7 @@ public class UserControllerLayer {
     }
     // Method to return a user's analytics data
     @GetMapping("users/inventory/analytics")
-    public @ResponseBody String getUserAnalytics(Principal principal) {
+    public @ResponseBody int getUserAnalytics(Principal principal) {
         return analyticsServiceLayer.getAnalytics(principal.getName());
     }
 
