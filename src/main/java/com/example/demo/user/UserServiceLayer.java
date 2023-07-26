@@ -29,10 +29,11 @@ public class UserServiceLayer {
         return userDBLayer.getFoodItemForUser(id, foodItem);
     }
 
-    public Boolean addItemToUserInventory(String id, FoodItem foodItem) {
+    public FoodItem addItemToUserInventory(String id, FoodItem foodItem) {
         if (userDBLayer.getUser(id) == null)
-            return false;
-        return inventoryDBLayer.addItemForUser(id, foodItem) && userDBLayer.addItemToUserInventory(id, foodItem);
+            return new FoodItem();
+        userDBLayer.addItemToUserInventory(id, foodItem);
+        return inventoryDBLayer.addItemForUser(id, foodItem);
     }
 
     public Boolean deleteItemFromUserInventory(String id, Long foodItem) {
