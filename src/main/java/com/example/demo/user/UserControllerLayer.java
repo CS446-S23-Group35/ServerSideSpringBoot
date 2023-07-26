@@ -112,7 +112,7 @@ public class UserControllerLayer {
 
     // Method to add an item to a user's inventory
     @PostMapping("users/inventory")
-    public @ResponseBody Boolean addItemToUserInventory(Principal principal, @RequestBody FoodItem foodItem) {
+    public @ResponseBody FoodItem addItemToUserInventory(Principal principal, @RequestBody FoodItem foodItem) {
         return userServiceLayer.addItemToUserInventory(principal.getName(), foodItem);
     }
 

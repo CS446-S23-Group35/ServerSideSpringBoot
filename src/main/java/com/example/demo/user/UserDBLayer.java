@@ -30,12 +30,11 @@ public class UserDBLayer {
         return new FoodItem();
     }
 
-    public Boolean addItemToUserInventory(String id, FoodItem foodItem) {
+    public User addItemToUserInventory(String id, FoodItem foodItem) {
         User user = getUser(id);
-        if (getUser(id) == null) return false;
+        if (getUser(id) == null) return new User();
         user.getInventory().put(foodItem.getId(), foodItem);
-        repository.save(user);
-        return true;
+        return repository.save(user);
     }
 
     public Boolean deleteItemFromUserInventory(String id, Long foodItemId) {
