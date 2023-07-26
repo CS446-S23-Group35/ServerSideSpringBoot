@@ -73,12 +73,26 @@ public class UserControllerLayer {
             .map(FoodItem::getName)
             .toList());
 
-        return searcher.SearchByNameWithInventory( body.name,
-            Searcher.Filters.empty().withExcludedIngredients(body.excludedIngredients)
-            .withInventoryIngredients(inventory_ingredients)
-            .withExpiringIngredients(expiring_ingredients),
-            page
-        );
+
+        String query = body.name.strip();
+        if (query == "") {
+            return searcher.SearchByInventory(
+                Searcher.Filters.empty()
+                .withExcludedIngredients(body.excludedIngredients)
+                .withInventoryIngredients(inventory_ingredients)
+                .withExpiringIngredients(expiring_ingredients),
+                page
+            );
+        } else {
+            return searcher.SearchByNameWithInventory(
+                body.name,
+                Searcher.Filters.empty()
+                .withExcludedIngredients(body.excludedIngredients)
+                .withInventoryIngredients(inventory_ingredients)
+                .withExpiringIngredients(expiring_ingredients),
+                page
+            );
+        }
     }
 
     @GetMapping("/heartbeat")
