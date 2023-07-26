@@ -81,7 +81,25 @@ public interface Searcher {
         }
     }
 
+    public class Page {
+        public int page_number;
+        public int page_size;
+        
+        public Page() {
+            this(0, 15);
+        }
+
+        public Page(int page_number, int page_size) {
+            this.page_number = page_number;
+            this.page_size = page_size;
+        }
+    }
+
     public List<Recipe> SearchByName(String name, Filters filters);
     public List<Recipe> SearchByInventory(Filters filters);
     public List<Recipe> SearchByNameWithInventory(String name, Filters filters);
+
+    public List<Recipe> SearchByName(String name, Filters filters, Page page);
+    public List<Recipe> SearchByInventory(Filters filters, Page page);
+    public List<Recipe> SearchByNameWithInventory(String name, Filters filters, Page page);
 }
