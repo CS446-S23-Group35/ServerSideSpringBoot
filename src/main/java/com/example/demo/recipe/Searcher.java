@@ -79,6 +79,41 @@ public interface Searcher {
         public String getBooleanName() {
             return this.booleanName;
         }
+
+        public static DietaryRestrictions fromString(String str) {
+            switch (str) {
+                case "is_vegan":
+                    return VEGAN;
+                case "is_vegetarian":
+                    return VEGETARIAN;
+                case "is_gluten_free":
+                    return GLUTEN_FREE;
+                case "is_dairy_free":
+                    return DAIRY_FREE;
+                case "is_nut_free":
+                    return NUT_FREE;
+                case "is_shellfish_free":
+                    return SHELLFISH_FREE;
+                case "is_egg_free":
+                    return EGG_FREE;
+                case "is_soy_free":
+                    return SOY_FREE;
+                case "is_fish_free":
+                    return FISH_FREE;
+                case "is_pork_free":
+                    return PORK_FREE;
+                case "is_red_meat_free":
+                    return RED_MEAT_FREE;
+                case "is_alcohol_free":
+                    return ALCOHOL_FREE;
+                case "is_kosher":
+                    return KOSHER;
+                case "is_halal":
+                    return HALAL;
+                default:
+                    return null;
+            }
+        }
     }
 
     public class Page {
