@@ -23,6 +23,7 @@ import org.opensearch.client.opensearch._types.query_dsl.FunctionScoreQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MultiMatchQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
@@ -72,6 +73,11 @@ public class OpenSearchImpl implements Searcher{
 
     @Override
     public List<Recipe> SearchByName(String name, Filters filters) {
+        return SearchByName(name, filters, new Page());
+    }
+    
+    @Override
+    public List<Recipe> SearchByName(String name, Filters filters, Page page) {
         MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
         .query(name)
         .fields("name^8", "description^4", "tags", "ingredients.name")
@@ -82,7 +88,7 @@ public class OpenSearchImpl implements Searcher{
         .should(multiMatchQuery._toQuery())
         .build();
 
-        return doSearch(boolQuery._toQuery());
+        return doSearch(boolQuery._toQuery(), page);
     }
 
     // Perform this query on the index "recipes" for each ingredient in excludedIngredients:
@@ -112,6 +118,11 @@ public class OpenSearchImpl implements Searcher{
 
     @Override
     public List<Recipe> SearchByInventory(Filters filters) {
+        return SearchByInventory(filters, new Page());
+    }
+
+    @Override
+    public List<Recipe> SearchByInventory(Filters filters, Page page) {
         BoolQuery boolQuery = createRestrictionFilter(filters).build();
 
         double baseWeight = 2.0;
@@ -131,10 +142,16 @@ public class OpenSearchImpl implements Searcher{
         .query(boolQuery._toQuery())
         .scoreMode(FunctionScoreMode.Sum).boostMode(FunctionBoostMode.Replace).build();
 
-        return doSearch(fsq._toQuery());
+        return doSearch(fsq._toQuery(), page);
     }
 
+    @Override
     public List<Recipe> SearchByNameWithInventory(String name, Filters filters) {
+        return SearchByNameWithInventory(name, filters, new Page());
+    }
+
+    @Override
+    public List<Recipe> SearchByNameWithInventory(String name, Filters filters, Page page) {
         MultiMatchQuery multiMatchQuery = new MultiMatchQuery.Builder()
         .query(name)
         .fields("name^40", "description^20", "tags^5", "ingredients.name^5")
@@ -160,14 +177,20 @@ public class OpenSearchImpl implements Searcher{
         .query(boolQuery._toQuery())
         .scoreMode(FunctionScoreMode.Sum).boostMode(FunctionBoostMode.Replace).build();
 
-        return doSearch(fsq._toQuery());
+        return doSearch(fsq._toQuery(), page);
     }
 
     // Perform a query and performs it on the index "recipes".
-    private List<Recipe> doSearch(Query query) {
+    private List<Recipe> doSearch(Query query, Page page) {
         List<Recipe> recipes = new ArrayList<Recipe>();
         try {
-            SearchResponse<Recipe> searchResponse = client.search(s -> s.index("recipes").query(query), Recipe.class);
+            SearchRequest searchRequest = new SearchRequest.Builder()
+            .index("recipes")
+            .query(query)
+            .from(page.page_number * page.page_size)
+            .size(page.page_size).build();
+
+            SearchResponse<Recipe> searchResponse = client.search(searchRequest, Recipe.class);
             System.out.println("Search response: " + searchResponse.hits().total().value());
             for (int i = 0; i < searchResponse.hits().hits().size(); i++) {
                 recipes.add(searchResponse.hits().hits().get(i).source());

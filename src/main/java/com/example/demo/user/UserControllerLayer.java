@@ -20,6 +20,12 @@ class RecipeQuery {
 
     @JsonProperty("excludedIngredients")
     List<String> excludedIngredients;
+
+    @JsonProperty("page_off")
+    int page_off;
+
+    @JsonProperty("page_size")
+    int page_size;
 }
 
 @RestController
@@ -47,6 +53,9 @@ public class UserControllerLayer {
 
     @PostMapping(value = "/recipes", consumes = {"application/json"})
     public @ResponseBody List<Recipe> getRecipes(Principal principal, @RequestBody RecipeQuery body) {
+        // If page size is 0, use default page size
+        Searcher.Page page = (body.page_size == 0) ? new Searcher.Page() : new Searcher.Page(body.page_off, body.page_size);
+
         HashMap<Long, FoodItem> inventory = getUser(principal).getInventory();
         List<FoodItem> inventory_list = new ArrayList<>(inventory.values());
         List<FoodItem> expiring_inventory_list = new ArrayList<>(inventory_list);
@@ -67,7 +76,8 @@ public class UserControllerLayer {
         return searcher.SearchByInventory(
             Searcher.Filters.empty().withExcludedIngredients(body.excludedIngredients)
             .withInventoryIngredients(inventory_ingredients)
-            .withExpiringIngredients(expiring_ingredients)
+            .withExpiringIngredients(expiring_ingredients),
+            page
         );
     }
 
