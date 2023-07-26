@@ -3,6 +3,7 @@ package com.example.demo.user;
 import com.example.demo.recipe.OpenSearchImpl;
 import com.example.demo.recipe.Recipe;
 import com.example.demo.recipe.Searcher;
+import com.example.demo.recipe.Recipe.DietartyMetadata;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,9 @@ class RecipeQuery {
 
     @JsonProperty("page_size")
     int page_size;
+
+    @JsonProperty("dietary_restrictions")
+    List<String> dietary_restrictions;
 }
 
 @RestController
@@ -67,31 +71,36 @@ public class UserControllerLayer {
         List<String> inventory_ingredients = new ArrayList<>(inventory_list.stream()
             .map(FoodItem::getName)
             .toList());
-        inventory_ingredients.addAll(body.includedIngredients);
+        if (body.includedIngredients != null) {
+            inventory_ingredients.addAll(body.includedIngredients);
+        }
 
         List<String> expiring_ingredients = new ArrayList<>(expiring_inventory_list.stream()
             .map(FoodItem::getName)
             .toList());
 
 
+        List<String> excludedItems = (body.excludedIngredients == null) ? new ArrayList<>() : body.excludedIngredients;
+        
+        List<Searcher.DietaryRestrictions> dietary_restrictions = new ArrayList<>();
+        if (body.dietary_restrictions != null) {
+            for (String restriction : body.dietary_restrictions) {
+                Searcher.DietaryRestrictions r = Searcher.DietaryRestrictions.fromString(restriction);
+                if (r != null) dietary_restrictions.add(r);
+            }
+        }
+
+        Searcher.Filters filters = Searcher.Filters.empty()
+        .withExcludedIngredients(excludedItems)
+        .withInventoryIngredients(inventory_ingredients)
+        .withExpiringIngredients(expiring_ingredients)
+        .withDietaryRestrictions(dietary_restrictions);
+
         String query = body.name.strip();
         if (query == "") {
-            return searcher.SearchByInventory(
-                Searcher.Filters.empty()
-                .withExcludedIngredients(body.excludedIngredients)
-                .withInventoryIngredients(inventory_ingredients)
-                .withExpiringIngredients(expiring_ingredients),
-                page
-            );
+            return searcher.SearchByInventory(filters,page);
         } else {
-            return searcher.SearchByNameWithInventory(
-                body.name,
-                Searcher.Filters.empty()
-                .withExcludedIngredients(body.excludedIngredients)
-                .withInventoryIngredients(inventory_ingredients)
-                .withExpiringIngredients(expiring_ingredients),
-                page
-            );
+            return searcher.SearchByNameWithInventory(query, filters, page);
         }
     }
 
