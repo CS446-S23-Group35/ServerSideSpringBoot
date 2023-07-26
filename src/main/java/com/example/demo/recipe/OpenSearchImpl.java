@@ -169,7 +169,7 @@ public class OpenSearchImpl implements Searcher{
         try {
             SearchResponse<Recipe> searchResponse = client.search(s -> s.index("recipes").query(query), Recipe.class);
             System.out.println("Search response: " + searchResponse.hits().total().value());
-            for (int i = 0; i < searchResponse.hits().total().value(); i++) {
+            for (int i = 0; i < searchResponse.hits().hits().size(); i++) {
                 recipes.add(searchResponse.hits().hits().get(i).source());
             }
         } catch (IOException e) {
