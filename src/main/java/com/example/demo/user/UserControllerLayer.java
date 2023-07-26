@@ -29,6 +29,9 @@ public class UserControllerLayer {
     @Autowired
     UserServiceLayer userServiceLayer;
 
+    @Autowired
+    AnalyticsServiceLayer analyticsServiceLayer;
+
     // Return the User data for the user with the associated username as per the incoming request
     // User data includes username plus their entire inventory list
     @GetMapping("users")
@@ -112,6 +115,13 @@ public class UserControllerLayer {
     public @ResponseBody Boolean deleteUserShoppingList(Principal principal) {
         return userServiceLayer.deleteUserShoppingList(principal.getName());
     }
+
+    // Method to return a user's analytics data
+    @GetMapping("users/inventory/analytics")
+    public @ResponseBody String getUserAnalytics(Principal principal) {
+        return analyticsServiceLayer.getAnalytics(principal.getName());
+    }
+
 
     // method for testing endpoint access from a client
     @GetMapping("sampleTest")
