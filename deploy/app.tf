@@ -18,6 +18,7 @@ resource "aws_ecs_task_definition" "application" {
       db_url = format("jdbc:postgresql://%s/postgres", aws_db_instance.user_db.address)
       db_username = aws_db_instance.user_db.username
       db_password = aws_db_instance.user_db.password
+      opensearch_address = var.opensearch_address
     }
   )
 }

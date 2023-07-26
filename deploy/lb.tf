@@ -23,7 +23,7 @@ resource "aws_alb_target_group" "main" {
    matcher             = "200"
    timeout             = "3"
    path                = "/heartbeat"
-   unhealthy_threshold = "2"
+   unhealthy_threshold = "6"
   }
 }
 

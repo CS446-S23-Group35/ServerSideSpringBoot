@@ -15,6 +15,10 @@
       {
         "name": "DB_PASSWORD",
         "value": "${db_password}"
+      },
+      {
+        "name": "OPENSEARCH_ADDRESS",
+        "value": "${opensearch_address}"
       }
     ],
     "portMappings": [
