@@ -10,8 +10,8 @@ public class Recipe {
     }
 
     public static class IngredientAmount {
-        public int unit;
-        public String unitStr;
+        public int type;
+        public String typeName;
         public double value;
     }
 
