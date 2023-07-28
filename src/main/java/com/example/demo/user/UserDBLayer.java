@@ -46,18 +46,32 @@ public class UserDBLayer {
     }
 
     public ArrayList<FoodItem> getUserShoppingList(String id) {
-        return new ArrayList<FoodItem>();
+        User user = getUser(id);
+        if (getUser(id) == null) return new ArrayList<>();
+        return user.getShoppingList();
     }
 
     public Boolean addItemToUserShoppingList(String id, String foodItem) {
+        User user = getUser(id);
+        if (getUser(id) == null) return false;
+        user.getShoppingList().add(new FoodItem(foodItem));
+        repository.save(user);
         return true;
     }
 
     public Boolean removeItemFromUserShoppingList(String id, String foodItem) {
+        User user = getUser(id);
+        if (getUser(id) == null) return false;
+        user.getShoppingList().removeIf(it -> it.getName().equalsIgnoreCase(foodItem));
+        repository.save(user);
         return true;
     }
 
     public Boolean deleteUserShoppingList(String id) {
+        User user = getUser(id);
+        if (getUser(id) == null) return false;
+        user.getShoppingList().clear();
+        repository.save(user);
         return true;
     }
 }
