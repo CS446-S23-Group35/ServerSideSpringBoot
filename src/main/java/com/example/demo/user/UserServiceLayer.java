@@ -32,11 +32,13 @@ public class UserServiceLayer {
     public FoodItem addItemToUserInventory(String id, FoodItem foodItem) {
         if (userDBLayer.getUser(id) == null)
             return new FoodItem();
-        userDBLayer.addItemToUserInventory(id, foodItem);
-        return inventoryDBLayer.addItemForUser(id, foodItem);
+        FoodItem actualFoodItem = inventoryDBLayer.addItemForUser(id, foodItem);
+        userDBLayer.addItemToUserInventory(id, actualFoodItem);
+        return actualFoodItem;
     }
 
     public Boolean deleteItemFromUserInventory(String id, Long foodItem) {
+        inventoryDBLayer.removeItemForUser(id, foodItem);
         return userDBLayer.deleteItemFromUserInventory(id, foodItem);
     }
 

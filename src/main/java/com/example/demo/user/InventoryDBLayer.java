@@ -16,12 +16,7 @@ public class InventoryDBLayer {
     }
 
     public FoodItem addItemForUser(String id, FoodItem foodItem) {
-        FoodItem item = repository.findById(foodItem.getId()).orElse(null);
-        if (item == null)
-            item = foodItem;
-
-        foodItem.copy_to(item);
-        return repository.save(item);
+        return repository.save(foodItem);
     }
 
     public Boolean removeItemForUser(String id, Long foodItemId) {
