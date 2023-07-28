@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceLayer {
@@ -37,7 +38,7 @@ public class UserServiceLayer {
         return actualFoodItem;
     }
 
-    public Boolean deleteItemFromUserInventory(String id, Long foodItem) {
+    public Map<Long, FoodItem> deleteItemFromUserInventory(String id, Long foodItem) {
         inventoryDBLayer.removeItemForUser(id, foodItem);
         return userDBLayer.deleteItemFromUserInventory(id, foodItem);
     }
@@ -46,19 +47,36 @@ public class UserServiceLayer {
         return userDBLayer.getUserShoppingList(id);
     }
 
-    public Boolean addItemToUserShoppingList(String id, String foodItem) {
+    public List<FoodItem> addItemToUserShoppingList(String id, String foodItem) {
         return userDBLayer.addItemToUserShoppingList(id, foodItem);
     }
 
-    public Boolean removeItemFromUserShoppingList(String id, String foodItem) {
+    public List<FoodItem> removeItemFromUserShoppingList(String id, String foodItem) {
         return userDBLayer.removeItemFromUserShoppingList(id, foodItem);
     }
 
-    public Boolean deleteUserShoppingList(String id) {
+    public List<FoodItem> deleteUserShoppingList(String id) {
         return userDBLayer.deleteUserShoppingList(id);
     }
 
     public User register(String id) {
         return userDBLayer.createUser(id);
+    }
+
+    public List<FoodItem> addItemsToUserInventory(String name, List<FoodItem> itemList) {
+        List<FoodItem> actualItemList = inventoryDBLayer.addItemsForUser(name, itemList);
+        return userDBLayer.addItemsToUserInventory(name, actualItemList);
+    }
+
+    public List<FoodItem> addItemsToUserShoppingList(String name, List<String> itemList) {
+        return userDBLayer.addItemsToUserShoppingList(name, itemList);
+    }
+
+    public List<FoodItem> deleteItemsFromUserShoppingList(String name, List<String> itemList) {
+        return userDBLayer.deleteItemsFromUserShoppingList(name, itemList);
+    }
+
+    public Map<Long, FoodItem> deleteItemsFromUserInventory(String name, List<FoodItem> itemList) {
+        return userDBLayer.deleteItemsFromUserInventory(name, itemList);
     }
 }

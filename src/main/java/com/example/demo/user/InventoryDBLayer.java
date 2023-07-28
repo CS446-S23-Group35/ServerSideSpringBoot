@@ -3,6 +3,7 @@ package com.example.demo.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -27,4 +28,10 @@ public class InventoryDBLayer {
         return true;
     }
 
+    public List<FoodItem> addItemsForUser(String name, List<FoodItem> itemList) {
+        List<FoodItem> ret = new ArrayList<>();
+        for (FoodItem it : itemList)
+            ret.add(repository.save(it));
+        return ret;
+    }
 }

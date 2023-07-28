@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class UserDBLayer {
@@ -22,7 +24,7 @@ public class UserDBLayer {
 
     public HashMap<Long, FoodItem> getUsersInventory(String id) {
         User user = getUser(id);
-        if (getUser(id) == null) return null;
+        if (user == null) return null;
         return user.getInventory();
     }
 
@@ -32,46 +34,76 @@ public class UserDBLayer {
 
     public User addItemToUserInventory(String id, FoodItem foodItem) {
         User user = getUser(id);
-        if (getUser(id) == null) return new User();
+        if (user == null) return new User();
         user.getInventory().put(foodItem.getId(), foodItem);
         return repository.save(user);
     }
 
-    public Boolean deleteItemFromUserInventory(String id, Long foodItemId) {
+    public Map<Long, FoodItem> deleteItemFromUserInventory(String id, Long foodItemId) {
         User user = getUser(id);
-        if (getUser(id) == null) return false;
+        if (user == null) return new HashMap<>();
         user.getInventory().remove(foodItemId);
         repository.save(user);
-        return true;
+        return user.getInventory();
     }
 
     public ArrayList<FoodItem> getUserShoppingList(String id) {
         User user = getUser(id);
-        if (getUser(id) == null) return new ArrayList<>();
+        if (user == null) return new ArrayList<>();
         return user.getShoppingList();
     }
 
-    public Boolean addItemToUserShoppingList(String id, String foodItem) {
+    public List<FoodItem> addItemToUserShoppingList(String id, String foodItem) {
         User user = getUser(id);
-        if (getUser(id) == null) return false;
+        if (user == null) return new ArrayList<>();
         user.getShoppingList().add(new FoodItem(foodItem));
         repository.save(user);
-        return true;
+        return user.getShoppingList();
     }
 
-    public Boolean removeItemFromUserShoppingList(String id, String foodItem) {
+    public List<FoodItem> removeItemFromUserShoppingList(String id, String foodItem) {
         User user = getUser(id);
-        if (getUser(id) == null) return false;
+        if (user == null) return new ArrayList<>();
         user.getShoppingList().removeIf(it -> it.getName().equalsIgnoreCase(foodItem));
         repository.save(user);
-        return true;
+        return user.getShoppingList();
     }
 
-    public Boolean deleteUserShoppingList(String id) {
+    public List<FoodItem> deleteUserShoppingList(String id) {
         User user = getUser(id);
-        if (getUser(id) == null) return false;
+        if (user == null) return new ArrayList<>();
         user.getShoppingList().clear();
         repository.save(user);
-        return true;
+        return user.getShoppingList();
+    }
+
+    public List<FoodItem> addItemsToUserInventory(String name, List<FoodItem> itemList) {
+        User user = getUser(name);
+        if (user == null) return new ArrayList<>();
+        for (FoodItem it : itemList)
+            user.getInventory().put(it.getId(), it);
+        return user.getInventory().values().stream().toList();
+    }
+
+    public List<FoodItem> addItemsToUserShoppingList(String name, List<String> itemList) {
+        User user = getUser(name);
+        if (user == null) return new ArrayList<>();
+        for (String it : itemList) user.getShoppingList().add(new FoodItem(it));
+        repository.save(user);
+        return user.getShoppingList();
+    }
+
+    public List<FoodItem> deleteItemsFromUserShoppingList(String name, List<String> itemList) {
+        User user = getUser(name);
+        if (user == null) return new ArrayList<>();
+        user.getShoppingList().removeIf(foodItem -> itemList.contains(foodItem.getName()));
+        return user.getShoppingList();
+    }
+
+    public Map<Long, FoodItem> deleteItemsFromUserInventory(String name, List<FoodItem> itemList) {
+        User user = getUser(name);
+        if (user == null) return new HashMap<>();
+        itemList.forEach(it -> user.getInventory().remove(it.getId()));
+        return user.getInventory();
     }
 }
