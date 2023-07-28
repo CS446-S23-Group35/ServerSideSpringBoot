@@ -41,12 +41,7 @@ public class UserServiceLayer {
     }
 
     public List<FoodItem> getUserShoppingList(String id) {
-        List<FoodItem> shoppingList = userDBLayer.getUserShoppingList(id);
-        // ensure items in shopping list have an "NA" value of expiration date
-        for (int i = 0; i < shoppingList.size(); i++) {
-            shoppingList.get(i).setExpiryDate(new Date(0L));
-        }
-        return shoppingList;
+        return userDBLayer.getUserShoppingList(id);
     }
 
     public Boolean addItemToUserShoppingList(String id, String foodItem) {

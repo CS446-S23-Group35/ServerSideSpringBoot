@@ -44,6 +44,8 @@ public class FoodItem {
 
     public FoodItem() { }
 
+    public FoodItem(String name) { this.name = name; }
+
     public void copy_to(FoodItem dest) {
         dest.setId(id);
         dest.setName(name);
