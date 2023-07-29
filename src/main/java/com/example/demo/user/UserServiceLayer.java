@@ -30,12 +30,11 @@ public class UserServiceLayer {
         return userDBLayer.getFoodItemForUser(id, foodItem);
     }
 
-    public FoodItem addItemToUserInventory(String id, FoodItem foodItem) {
+    public Map<Long, FoodItem> addItemToUserInventory(String id, FoodItem foodItem) {
         if (userDBLayer.getUser(id) == null)
-            return new FoodItem();
+            return new HashMap<>();
         FoodItem actualFoodItem = inventoryDBLayer.addItemForUser(id, foodItem);
-        userDBLayer.addItemToUserInventory(id, actualFoodItem);
-        return actualFoodItem;
+        return userDBLayer.addItemToUserInventory(id, actualFoodItem);
     }
 
     public Map<Long, FoodItem> deleteItemFromUserInventory(String id, Long foodItem) {

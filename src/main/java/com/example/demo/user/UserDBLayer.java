@@ -32,11 +32,11 @@ public class UserDBLayer {
         return new FoodItem();
     }
 
-    public User addItemToUserInventory(String id, FoodItem foodItem) {
+    public Map<Long, FoodItem> addItemToUserInventory(String id, FoodItem foodItem) {
         User user = getUser(id);
-        if (user == null) return new User();
+        if (user == null) return new HashMap<>();
         user.getInventory().put(foodItem.getId(), foodItem);
-        return repository.save(user);
+        return repository.save(user).getInventory();
     }
 
     public Map<Long, FoodItem> deleteItemFromUserInventory(String id, Long foodItemId) {
@@ -82,6 +82,7 @@ public class UserDBLayer {
         if (user == null) return new ArrayList<>();
         for (FoodItem it : itemList)
             user.getInventory().put(it.getId(), it);
+        repository.save(user);
         return user.getInventory().values().stream().toList();
     }
 
@@ -97,6 +98,7 @@ public class UserDBLayer {
         User user = getUser(name);
         if (user == null) return new ArrayList<>();
         user.getShoppingList().removeIf(foodItem -> itemList.contains(foodItem.getName()));
+        repository.save(user);
         return user.getShoppingList();
     }
 
@@ -104,6 +106,7 @@ public class UserDBLayer {
         User user = getUser(name);
         if (user == null) return new HashMap<>();
         itemList.forEach(it -> user.getInventory().remove(it.getId()));
+        repository.save(user);
         return user.getInventory();
     }
 }
