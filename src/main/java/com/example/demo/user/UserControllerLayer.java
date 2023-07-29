@@ -32,6 +32,16 @@ class RecipeQuery {
     List<String> dietary_restrictions;
 }
 
+class FoodItemListRequestBody {
+    @JsonProperty("item_list")
+    List<FoodItem> item_list;
+}
+
+class ShoppingListRequestBody {
+    @JsonProperty
+    List<String> item_list;
+}
+
 @RestController
 public class UserControllerLayer {
     Searcher searcher = new OpenSearchImpl(System.getenv("OPENSEARCH_ADDRESS"));
@@ -125,9 +135,19 @@ public class UserControllerLayer {
         return userServiceLayer.addItemToUserInventory(principal.getName(), foodItem);
     }
 
+    @PostMapping("users/inventory/add-items")
+    public @ResponseBody List<FoodItem> addItemsToUserInventory(Principal principal, @RequestBody FoodItemListRequestBody requestBody) {
+        return userServiceLayer.addItemsToUserInventory(principal.getName(), requestBody.item_list);
+    }
+
+    @PostMapping("users/inventory/delete-items")
+    public @ResponseBody Map<Long, FoodItem> deleteItemsFromUserInventory(Principal principal, @RequestBody FoodItemListRequestBody requestBody) {
+        return userServiceLayer.deleteItemsFromUserInventory(principal.getName(), requestBody.item_list);
+    }
+
     // Method to remove an item from a User's inventory
     @DeleteMapping("users/inventory/{foodItemId}")
-    public @ResponseBody Boolean deleteItemFromUserInventory(Principal principal, @PathVariable Long foodItemId) {
+    public @ResponseBody Map<Long, FoodItem> deleteItemFromUserInventory(Principal principal, @PathVariable Long foodItemId) {
         return userServiceLayer.deleteItemFromUserInventory(principal.getName(), foodItemId);
     }
 
@@ -139,19 +159,30 @@ public class UserControllerLayer {
 
     // Method to add an item to user's shopping list
     @GetMapping("users/shopping-list/{foodItem}")
-    public @ResponseBody Boolean addItemToUserShoppingList(Principal principal, @PathVariable String foodItem) {
+    public @ResponseBody List<FoodItem> addItemToUserShoppingList(Principal principal, @PathVariable String foodItem) {
         return userServiceLayer.addItemToUserShoppingList(principal.getName(), foodItem);
+    }
+
+    // Method to add items to user's shopping list
+    @PostMapping("users/shopping-list/add-items")
+    public @ResponseBody List<FoodItem> addItemsToUserShoppingList(Principal principal, @RequestBody ShoppingListRequestBody requestBody) {
+        return userServiceLayer.addItemsToUserShoppingList(principal.getName(), requestBody.item_list);
+    }
+
+    @PostMapping("users/shopping-list/delete-items")
+    public @ResponseBody List<FoodItem> deleteItemsFromUserShoppingList(Principal principal, @RequestBody ShoppingListRequestBody requestBody) {
+        return userServiceLayer.deleteItemsFromUserShoppingList(principal.getName(), requestBody.item_list);
     }
 
     // Method to remove an item from user's shopping list
     @DeleteMapping("users/shopping-list/{foodItem}")
-    public @ResponseBody Boolean removeItemFromUserShoppingList(Principal principal, @PathVariable String foodItem) {
+    public @ResponseBody List<FoodItem> removeItemFromUserShoppingList(Principal principal, @PathVariable String foodItem) {
         return userServiceLayer.removeItemFromUserShoppingList(principal.getName(), foodItem);
     }
 
     // Method to clear shopping list
     @DeleteMapping("users/shopping-list")
-    public @ResponseBody Boolean deleteUserShoppingList(Principal principal) {
+    public @ResponseBody List<FoodItem> deleteUserShoppingList(Principal principal) {
         return userServiceLayer.deleteUserShoppingList(principal.getName());
     }
     // Method to return a user's analytics data
